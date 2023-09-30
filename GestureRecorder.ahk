@@ -114,6 +114,7 @@ GestureRecorder() {
             hgs.Clear()
             testBtn.Text := "Test"
             statusBar.Text := ""
+            addBtn.Opt("-Disabled")
             deleteBtn.Opt("-Disabled")
             genCodeBtn.Opt("-Disabled")
             distanceEdit.Opt("-Disabled")
@@ -133,6 +134,7 @@ GestureRecorder() {
             InitDrawingBoard()
             testBtn.Text := "Stop Test"
             statusBar.Text := "Testing"
+            addBtn.Opt("Disabled")
             deleteBtn.Opt("Disabled")
             genCodeBtn.Opt("Disabled")
             distanceEdit.Opt("Disabled")
