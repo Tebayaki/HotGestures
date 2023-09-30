@@ -1,7 +1,9 @@
 # HotGestures
-A light Autohotkey library for creating and recognizing custom mouse gestures.
+This is a light Autohotkey library for mouse gestures creating and recognizing. It helps you to customize any one-stroke pattern and bind it to any function.  
+It can accurately recognize complex patterns, including straight lines, arcs, and polylines. So you can draw L, O, M, U, Z, and even a star shape on the screen to do whatever you want.
+![demo](./pic/demo.gif)
 ## How it works
-HotGestures recognizes mouse gestures by measuring the similarity of two sets of vectors through the DTW(Dynamic Time Warping). What we need to do is to provide several sets of vectors describing the mouse gestures as standard pattern. When we do a gesture, it compares the current mouse track with all the saved patterns and selects the closest one from the matched patterns.
+HotGestures recognizes mouse gestures by measuring the similarity of two sets of vectors through the DTW(Dynamic Time Warping). What we need to do is to provide several sets of vectors describing the mouse gestures as standard patterns. When we do a gesture, it compares the current mouse track with all the saved patterns and selects the closest one from the matched patterns.
 ## Vectors generation
 A gesture can be seen as a set of vectors. HotGestures saves and parses string describing vectors in this format: `[NAME:]X1,Y1[|X2,Y2]...`
 #### For example:
