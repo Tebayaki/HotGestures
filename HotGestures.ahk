@@ -66,7 +66,7 @@ class HotGestures {
         this.__vectors := []
         for , mi in this.__matchInfos {
             mi.Excluded := false
-            mi.Matrix.Length := 0
+            mi.Matrix.Clear()
         }
         this.Result := { Valid: false, Vectors: this.__vectors, MatchedGesture: "", Distance: "", Comment: "", }
         this.__mouseHook := HotGestures.MouseHook(this.__OnMouseMove.Bind(this))
@@ -322,67 +322,48 @@ class HotGestures {
 
     class DistanceMatrix extends Array {
         __New(standard) {
+            static INF := NumGet(ObjPtr(&_ := 0x7F800000) + A_PtrSize * 2, "float")
+
+            if !len := standard.Length
+                throw Error("invalid parameter")
+
             this.Standard := standard
+            this.Capacity := len + 1
+
+            this.RowTemplate := []
+            this.RowTemplate.Capacity := len + 1
+            this.RowTemplate.Push(INF)
+
+            this.Push(firstRow := this.RowTemplate.Clone())
+            firstRow[1] := 0
+            loop len
+                firstRow.Push(INF)
         }
 
         Append(newVector) {
             static Distance(a, b) => 1 - (a[1] * b[1] + a[2] * b[2]) / (Sqrt(a[1] ** 2 + a[2] ** 2) * Sqrt(b[1] ** 2 + b[2] ** 2))
 
             standard := this.Standard
-            row := []
-            row.Capacity := standard.Length
-            if this.Length == 0 {
-                d := 0
-                for v in standard
-                    row.Push(d += Distance(newVector, v))
-            }
-            else {
-                row.Push(d := Distance(newVector, standard[1]) + this[-1][1])
-                loop standard.Length - 1
-                    row.Push(d := Distance(newVector, standard[A_Index + 1]) + Min(d, this[-1][A_Index], this[-1][A_Index + 1]))
-            }
-            this.Push(row)
+            lastRow := this[-1]
+
+            this.Push(newRow := this.RowTemplate.Clone())
+            loop standard.Length
+                newRow.Push(Distance(newVector, standard[A_Index]) + Min(newRow[A_Index], lastRow[A_Index], lastRow[A_Index + 1]))
         }
 
         TraceBack() {
-            matrix := this
-            vectors := this.Standard
-            i := matrix.Length
-            j := vectors.Length
-            count := 0
-            d := 0
-            loop {
-                if i > 1 && j > 1 {
-                    current := matrix[i][j]
-                    fork1 := matrix[i - 1][j]
-                    fork2 := matrix[i][j - 1]
-                    fork3 := matrix[i - 1][j - 1]
-                    m := Min(fork1, fork2, fork3)
-                    d += current - m
-                    count++
-                    switch m {
-                        case fork3: i--, j--
-                        case fork2: j--
-                        default: i--
-                    }
+            i := this.Length - 1 , j := this[1].Length - 1 , count := 1
+            while i > 1 && j > 1 {
+                switch min(a := this[i][j], b := this[i][j + 1], this[i + 1][j]) {
+                    case a: i--, j--
+                    case b: i--
+                    default: j--
                 }
-                else if i == 1 && j == 1 {
-                    d += matrix[i][j]
-                    count++
-                    break
-                }
-                else if i == 1 {
-                    d += matrix[1][j]
-                    count += j
-                    break
-                }
-                else if j == 1 {
-                    d += matrix[i][1]
-                    count += i
-                    break
-                }
+                count++
             }
-            return d / count
+            return this[-1][-1] / (count + i + j - 2)
         }
+
+        Clear() => this.Length := 1
     }
 }
